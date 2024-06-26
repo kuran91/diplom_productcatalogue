@@ -30,9 +30,20 @@ pipeline {
         stage('Deploy to k8s'){
             steps{
                 script{
-                    kubernetesDeploy (configs: 'deploymentservice.yaml',kubeconfigId: 'k8sconfigpwd')
+                    kubernetesDeploy (configs: 'product-catalogue.yaml',kubeconfigId: 'kubenetes')
                 }
             }
         }
     }
+    post {
+        always {
+            emailext (
+                to: 'kuranxxx91@gmail.com',
+                subject: "Результат сборки: ${currentBuild.fullDisplayName}",
+                body: """<p>СБОРКА: ${env.JOB_NAME} ${env.BUILD_NUMBER} (${env.BUILD_URL})</p>
+                         <p>СТАТУС: ${currentBuild.currentResult}</p>""",
+                mimeType: 'text/html'
+            )
+        }
+    }    
 }
